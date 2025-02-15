@@ -1,2 +1,2 @@
 Implementation of simple neural network using only numpy. <br>
-Training sample from [text](https://www.kaggle.com/competitions/digit-recognizer)
+Training sample from [kaggle](https://www.kaggle.com/competitions/digit-recognizer)
