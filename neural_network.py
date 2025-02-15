@@ -91,7 +91,7 @@ class Neural_Network:
         return 2*(y_pred-y_true)/(y_true.size)
     
     def categorical_crossentropy_loss(self, y_pred, y_true):
-
+        
         return
     
     def categorical_crossentropy_derivative(self, y_pred, y_true):
