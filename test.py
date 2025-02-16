@@ -3,13 +3,7 @@ import pandas as pd
 from neural_network import Neural_Network
 
 df=pd.read_csv("./sample/train.csv", header=0)
-nn = Neural_Network((df.shape[1]-1, 64, 64, 10))
-
-def get_model(num_epoch):
-    epoch_directory = f"./model/epoch_{num_epoch}"
-    weight = [np.loadtxt(epoch_directory+f"/online_{i+1}.txt", delimiter=" ", dtype=float) for i in range(nn.layers-1)]
-    nn.copy_network(weight)
-    return
+nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "sigmoid", loss="mean_squared_error")
 
 def get_image(start, amount):
     img = []
@@ -20,15 +14,15 @@ def get_image(start, amount):
     return (label, np.array(img))
 
 def test(input, label):
-    nn.forward(input)
-    print("Prediction:", np.argmax(nn.forward(input)))
+    output = nn.forward(input)
+    print(output, np.sum(output))
+    print("Prediction:", np.argmax(output))
     print("Ans:", label)
     print(48*'-')
     return
 
-
-sample = get_image(1000, 100)
-get_model(6000)
+sample = get_image(10000, 100)
+nn.load_model(f"epoch_{2100}", "w")
 for i in range(sample[1].shape[0]):
     test(sample[1][i], sample[0][i])
 

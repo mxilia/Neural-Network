@@ -6,12 +6,13 @@ import utility as util
 np.set_printoptions(threshold=np.inf)
 
 df=pd.read_csv("./sample/train.csv", header=0)
-nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "softmax", loss="categorical_crossentropy")
+nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "sigmoid", loss="mean_squared_error")
 
 ans = 10
-alpha = 0.01
-batch = 7
+alpha = 0.1
+batch = 20
 epoch = int(df.shape[0]/batch)
+time = 1
 
 def get_image(start, amount):
     img = []
@@ -26,25 +27,15 @@ def get_image(start, amount):
 def train():
     global batch, alpha
     count = 0
-    for i in range(epoch):
-        sample = get_image(i*batch, batch)
-        label = sample[0]
-        img = sample[1]
-        output = nn.forward(img)
-        nn.back_prop(label, img, batch, alpha)
-        loss = nn.mse_loss(nn.forward(img), label)
-        print(f"Epoch {i+1} Loss: {nn.mse_loss(nn.forward(img), label)}")
-        print(output)
-        count+=1
+    for t in range(time):
+        for i in range(epoch):
+            sample = get_image(i*batch, batch)
+            label = sample[0]
+            img = sample[1]
+            nn.forward(img)
+            nn.back_prop(label, img, alpha)
+            print(f"Epoch {i+1} Loss: {nn.loss_func(nn.forward(img), label)}")
+            count+=1
     return count
 
-def save_model(num_epoch):
-    epoch_directory = f"./model/epoch_{num_epoch}"
-    util.create_directory(epoch_directory)
-    weight = nn.getWeight()
-    np.set_printoptions(threshold=np.inf)
-    for i in range(len(weight)): np.savetxt(epoch_directory+f"/online_{i+1}.txt",weight[i], delimiter=" ", fmt="%s")
-    print(f"Saved epoch_{num_epoch} successfully.")
-    return
-
-save_model(train())
+nn.save_model(f"epoch_{train()}", "w")
