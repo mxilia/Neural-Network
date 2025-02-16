@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from neural_network import Neural_Network
-import utility as util
 
 np.set_printoptions(threshold=np.inf)
 
