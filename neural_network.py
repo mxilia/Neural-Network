@@ -1,5 +1,4 @@
 import numpy as np
-import utility as util
 import os
 
 class Neural_Network:
@@ -14,8 +13,24 @@ class Neural_Network:
         self.build()
         pass
 
+    def create_directory(self, directory):
+        print(directory)
+        try:
+            os.mkdir(directory)
+            print("Success")
+        except FileExistsError:
+            print("Existed")
+            return
+        except PermissionError:
+            print("Denied")
+            return
+        except Exception as e:
+            print("Error")
+            return
+        return
+
     def build(self):
-        util.create_directory(self.model_directory)
+        self.create_directory(self.model_directory)
         self.w = [self.gen_weight(self.structure[i-1], self.structure[i]) for i in range(1, self.layers, 1)]
         self.z = [None for i in range(self.layers+1)]
         self.b = [self.gen_bias(self.structure[i]) for i in range(self.layers)]
@@ -76,7 +91,7 @@ class Neural_Network:
 
     def save_model(self, folder_name, name):
         this_directory = f"./model/{folder_name}"
-        util.create_directory(this_directory)
+        self.create_directory(this_directory)
         np.set_printoptions(threshold=np.inf)
         for i in range(len(self.w)): np.savetxt(f"{this_directory}/{name}_{i+1}.txt", self.w[i], delimiter=" ", fmt="%s")
         print(f"Saved {folder_name} successfully.")
@@ -116,8 +131,8 @@ class Neural_Network:
         return sig*(1-sig)
     
     def softmax(self, x):
-        exp_x = np.exp(x-np.max(x))
-        return exp_x/np.sum(exp_x)
+        exp_x = np.exp(x-np.max(x, axis=1, keepdims=True))
+        return exp_x/np.sum(exp_x, axis=1, keepdims=True)
     
     def softmax_derivative(self, x):
         if(self.loss == "categorical_crossentropy"): return 1
@@ -131,7 +146,11 @@ class Neural_Network:
         return 2*(y_pred-y_true)/(y_true.size)
     
     def cce_loss(self, y_pred, y_true):
-        return -np.sum(y_pred*np.log(y_true+1e-9))
+        m = y_true.shape[0]  # number of samples
+        p = y_pred[range(m), np.argmax(y_true, axis=1)]  # predicted probabilities for true classes
+        log_likelihood = -np.log(p)
+        loss = np.sum(log_likelihood) / m
+        return loss
     
     def cce_derivative(self, y_pred, y_true):
         return y_pred-y_true

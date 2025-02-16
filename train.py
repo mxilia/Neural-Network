@@ -6,13 +6,13 @@ import utility as util
 np.set_printoptions(threshold=np.inf)
 
 df=pd.read_csv("./sample/train.csv", header=0)
-nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "sigmoid", loss="mean_squared_error")
+nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "softmax", loss="categorical_crossentropy")
 
 ans = 10
-alpha = 0.1
-batch = 20
+alpha = 0.2
+batch = 30
 epoch = int(df.shape[0]/batch)
-time = 1
+time = 3
 
 def get_image(start, amount):
     img = []
@@ -21,7 +21,7 @@ def get_image(start, amount):
         temp = np.zeros(10)
         temp[df.iloc[i,0]] = 1.0
         label.append(temp)
-        img.append(np.array(df.iloc[i,1:]))
+        img.append(np.array(df.iloc[i,1:]/255.0))
     return (np.array(label), np.array(img))
 
 def train():

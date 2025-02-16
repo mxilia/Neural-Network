@@ -37,20 +37,4 @@ class Queue:
             self.push(queue.front())
             queue.pop()
         return
-    
 
-def create_directory(directory):
-    print(directory)
-    try:
-        os.mkdir(directory)
-        print("Success")
-    except FileExistsError:
-        print("Existed")
-        return
-    except PermissionError:
-        print("Denied")
-        return
-    except Exception as e:
-        print("Error")
-        return
-    return

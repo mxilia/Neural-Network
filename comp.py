@@ -1,7 +1,7 @@
 import numpy as np
 from neural_network import Neural_Network
 
-class NeuralNetwork:
+class ChatNeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size):
         self.layers = 3  # Input, Hidden, Output
 
@@ -76,15 +76,15 @@ X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])  # Inputs
 y = np.array([[0], [1], [1], [0]])  # Expected outputs
 
 # Initialize and train the network
-nn = NeuralNetwork(input_size=2, hidden_size=3, output_size=1)
+nn = ChatNeuralNetwork(input_size=2, hidden_size=3, output_size=1)
 mnn = Neural_Network((2, 3, 1), hidden_activation="tanh", output_activation="sigmoid", loss="mean_squared_error")
 
 def train_mnn():
     for i in range(5000):
         output = mnn.forward(X)
         mnn.back_prop(y, X, 0.5)
-        if i % 500 == 0:
-            print(f"Epoch {i}, Loss: {mnn.loss_func(output, y):.6f}")
+        if (i+1) % 500 == 0:
+            print(f"Epoch {i+1}, Loss: {mnn.loss_func(output, y):.6f}")
     return
 
 # train
