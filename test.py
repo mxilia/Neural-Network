@@ -28,8 +28,8 @@ def test(input, label):
     print(48*'-')
     return
 
-sample = get_image(20553, 20000)
-nn.load_model(f"epoch_{4200}", "w")
+sample = get_image(round(df.shape[0]/2), df.shape[0]-(round(df.shape[0]/2)))
+nn.load_model(f"epoch_{700}", "w")
 for i in range(sample[1].shape[0]):
     test(np.array([sample[1][i]]), sample[0][i])
 loss = nn.loss_func(nn.forward(sample[1]), sample[2])

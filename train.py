@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from neural_network import Neural_Network
 
 np.set_printoptions(threshold=np.inf)
@@ -7,11 +8,15 @@ np.set_printoptions(threshold=np.inf)
 df=pd.read_csv("./sample/train.csv", header=0)
 nn = Neural_Network((df.shape[1]-1, 64, 64, 10), hidden_activation = "sigmoid", output_activation = "softmax", loss="categorical_crossentropy")
 
+list_loss = []
+list_acc = []
+
 ans = 10
-alpha = 0.2
+alpha = 0.65
 batch = 30
-epoch = int(df.shape[0]/batch)
-time = 3
+sample_size = df.shape[0]/2
+epoch = int(sample_size/batch)
+time = 1
 
 def get_image(start, amount):
     img = []
@@ -33,8 +38,17 @@ def train():
             img = sample[1]
             nn.forward(img)
             nn.back_prop(label, img, alpha)
-            print(f"Epoch {i+1} Loss: {nn.loss_func(nn.forward(img), label)}")
+            list_loss.append(nn.loss_func(nn.forward(img), label))
             count+=1
     return count
 
+def plot():
+    plt.figure(figsize=(6,4), dpi=100)
+    plt.plot(list_loss)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.show()
+    return
+
 nn.save_model(f"epoch_{train()}", "w")
+plot()

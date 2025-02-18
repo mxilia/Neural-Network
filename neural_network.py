@@ -81,16 +81,16 @@ class Neural_Network:
         return
     
     def load_model(self, folder_name, name):
-        this_directory = f"./model/{folder_name}"
+        this_directory = f"{self.model_directory}/{folder_name}"
         if(not os.path.exists(this_directory)):
             print(f"{folder_name} does not exist.")
-            return
+            exit(0)
         weight = [np.loadtxt(f"{this_directory}/{name}_{i+1}.txt", delimiter=" ", dtype=float) for i in range(self.layers-1)]
         self.copy_network(weight)
         return
 
     def save_model(self, folder_name, name):
-        this_directory = f"./model/{folder_name}"
+        this_directory = f"{self.model_directory}/{folder_name}"
         self.create_directory(this_directory)
         np.set_printoptions(threshold=np.inf)
         for i in range(len(self.w)): np.savetxt(f"{this_directory}/{name}_{i+1}.txt", self.w[i], delimiter=" ", fmt="%s")
@@ -106,6 +106,7 @@ class Neural_Network:
         return
     
     def gen_weight(self, l1, l2):
+        if(self.hidden_activation == "relu"): return np.random.randn(l1, l2)*np.sqrt(2/l1)
         return np.random.randn(l1, l2)*np.sqrt(1/l1)
     
     def gen_bias(self, size):
@@ -146,11 +147,9 @@ class Neural_Network:
         return 2*(y_pred-y_true)/(y_true.size)
     
     def cce_loss(self, y_pred, y_true):
-        m = y_true.shape[0]  # number of samples
-        p = y_pred[range(m), np.argmax(y_true, axis=1)]  # predicted probabilities for true classes
+        p = y_pred[range(y_true.shape[0]), np.argmax(y_true, axis=1)] 
         log_likelihood = -np.log(p)
-        loss = np.sum(log_likelihood) / m
-        return loss
+        return np.sum(log_likelihood)/y_true.shape[0]
     
     def cce_derivative(self, y_pred, y_true):
         return y_pred-y_true
@@ -161,6 +160,7 @@ class Neural_Network:
     def back_prop(self, y_true, input, alpha=0.001):
         batch_size = y_true.shape[0]
         losses = self.loss_dfunc(self.a[self.layers-1], y_true)
+        print(self.loss_func(self.a[self.layers-1], y_true))
         self.dz[self.layers-1] = losses*self.output_dfunc(self.z[self.layers-1])
         for i in range(self.layers-2, 0, -1): self.dz[i] = np.dot(self.dz[i+1], self.w[i].T)*self.hidden_dfunc(self.z[i])
         for i in range(1, self.layers): self.db[i] = np.sum(self.dz[i], axis=0)/batch_size
